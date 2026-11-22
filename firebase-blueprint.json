@@ -1,0 +1,167 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated learner preferences and aggregated 6-max poker mastery totals.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Owner Firebase Auth UID."
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "Learner display name."
+        },
+        "fourColorDeck": {
+          "type": "boolean",
+          "description": "Whether four-color suit rendering is enabled."
+        },
+        "soundEnabled": {
+          "type": "boolean",
+          "description": "Whether Web Audio card and chip cues are enabled."
+        },
+        "totalDecisions": {
+          "type": "number",
+          "description": "Cumulative count of graded poker decisions."
+        },
+        "optimalCount": {
+          "type": "number",
+          "description": "Count of decisions graded Optimal or Acceptable."
+        },
+        "totalEvLossBb": {
+          "type": "number",
+          "description": "Cumulative EV loss across graded decisions in big blinds."
+        },
+        "currentStreak": {
+          "type": "number",
+          "description": "Current consecutive optimal/acceptable streak."
+        },
+        "bestStreak": {
+          "type": "number",
+          "description": "Best recorded streak."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of profile creation."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update."
+        }
+      },
+      "required": [
+        "uid",
+        "displayName",
+        "fourColorDeck",
+        "soundEnabled",
+        "totalDecisions",
+        "optimalCount",
+        "totalEvLossBb",
+        "currentStreak",
+        "bestStreak",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "DrillAttempt": {
+      "title": "DrillAttempt",
+      "description": "A single graded decision from any FeltLab gameplay drill module.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Owner Firebase Auth UID."
+        },
+        "module": {
+          "type": "string",
+          "enum": ["preflop", "postflop", "math", "reading", "table"],
+          "description": "Drill module that produced the decision."
+        },
+        "position": {
+          "type": "string",
+          "enum": ["UTG", "HJ", "CO", "BTN", "SB", "BB", "ALL"],
+          "description": "Hero seat position in 6-max."
+        },
+        "street": {
+          "type": "string",
+          "enum": ["preflop", "flop", "turn", "river", "math"],
+          "description": "Street or math category."
+        },
+        "spotLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "description": "Concise human-readable spot summary."
+        },
+        "chosenAction": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "Action submitted by the user."
+        },
+        "bestAction": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "Highest-frequency or optimal solver action."
+        },
+        "evLossBb": {
+          "type": "number",
+          "description": "Expected value lost in big blinds (0 for optimal)."
+        },
+        "grade": {
+          "type": "string",
+          "enum": ["Optimal", "Acceptable", "Inaccuracy", "Mistake", "Blunder"],
+          "description": "Non-hue-only mastery grade."
+        },
+        "accuracyScore": {
+          "type": "number",
+          "description": "Normalized 0-100 accuracy score for the spot."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of drill attempt."
+        }
+      },
+      "required": [
+        "uid",
+        "module",
+        "position",
+        "street",
+        "spotLabel",
+        "chosenAction",
+        "bestAction",
+        "evLossBb",
+        "grade",
+        "accuracyScore",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Owner-scoped learner profile, preferences, and aggregate mastery stats."
+    },
+    "/users/{userId}/attempts/{attemptId}": {
+      "schema": {
+        "$ref": "#/entities/DrillAttempt"
+      },
+      "description": "Owner-scoped history of graded drill decisions for leak tracking."
+    }
+  }
+}

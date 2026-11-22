@@ -1,0 +1,6 @@
+{
+  "name": "FeltLab",
+  "description": "6-max 100bb Texas Hold'em mastery studio with preflop ranges, postflop solver drills, pot odds & EV math, hand reading, and live table play.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
