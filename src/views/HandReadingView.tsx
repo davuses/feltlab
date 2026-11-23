@@ -14,6 +14,7 @@ import { GradeBadge } from '../components/GradeBadge';
 import { playPokerSound } from '../utils/sound';
 import { useLocale } from '../i18n/LocaleContext';
 import { translateQuickPreset } from '../i18n/translations';
+import { localizeHandReadingSpot } from '../i18n/drillContentZh';
 
 interface HandReadingViewProps {
   prefs: UserPreferences;
@@ -29,6 +30,7 @@ export function HandReadingView({ prefs, onRecordAttempt }: HandReadingViewProps
   const [validationMsg, setValidationMsg] = useState<string | null>(null);
 
   const spot = HAND_READING_SPOTS[spotIndex];
+  const displaySpot = localizeHandReadingSpot(locale, spot);
   const targetSet = useMemo(() => new Set(spot.targetHands), [spot]);
 
   const selectedComboCount = useMemo(() => {
@@ -137,9 +139,9 @@ export function HandReadingView({ prefs, onRecordAttempt }: HandReadingViewProps
         <div className="xl:col-span-7 bg-[#111722] border border-[#222D3D] rounded-xl p-5 sm:p-6 space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-base font-semibold text-white">{spot.promptQuestion}</h2>
+              <h2 className="text-base font-semibold text-white">{displaySpot.promptQuestion}</h2>
               <p className="text-xs font-mono tabular-nums text-slate-400 mt-0.5">
-                {spot.streetLabel} · {t('common.pot')} {spot.potBb.toFixed(1)}bb · {t('reading.selected')}:{' '}
+                {displaySpot.streetLabel} · {t('common.pot')} {spot.potBb.toFixed(1)}bb · {t('reading.selected')}:{' '}
                 <span className="text-emerald-300 font-semibold">
                   {selectedComboCount} {t('reading.combos')}
                 </span>
@@ -287,14 +289,14 @@ export function HandReadingView({ prefs, onRecordAttempt }: HandReadingViewProps
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-white">{t('reading.timelineTitle')}</h3>
             <div className="space-y-2.5">
-              {spot.timeline.map((step, i) => (
+              {displaySpot.timeline.map((step, i) => (
                 <div
                   key={i}
                   className="bg-[#0B1017] border border-[#1E293B] rounded-lg p-3.5 space-y-1"
                 >
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-mono font-semibold text-emerald-400">{step.street}</span>
-                    <span className="text-slate-200 font-medium">{step.detail}</span>
+                  <div className="flex items-center justify-between gap-2 text-xs">
+                    <span className="font-mono font-semibold text-emerald-400 shrink-0">{step.street}</span>
+                    <span className="text-slate-200 font-medium text-right">{step.detail}</span>
                   </div>
                   <p className="text-xs text-slate-400 leading-relaxed">{step.narrowingHint}</p>
                 </div>
@@ -331,10 +333,10 @@ export function HandReadingView({ prefs, onRecordAttempt }: HandReadingViewProps
                 </div>
               </div>
 
-              <p className="text-xs text-slate-300 leading-relaxed">{spot.explanation}</p>
+              <p className="text-xs text-slate-300 leading-relaxed">{displaySpot.explanation}</p>
 
               <div className="bg-[#0C1814] border border-emerald-500/25 rounded-lg p-3 text-xs text-slate-200">
-                {spot.keyCombosNote}
+                {displaySpot.keyCombosNote}
               </div>
 
               {result.missedHands.length > 0 && (

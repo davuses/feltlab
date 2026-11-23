@@ -13,6 +13,7 @@ import { GradeBadge } from '../components/GradeBadge';
 import { playPokerSound } from '../utils/sound';
 import { useLocale } from '../i18n/LocaleContext';
 import { translateMathCategory, type TranslationKey } from '../i18n/translations';
+import { localizeMathQuestion } from '../i18n/drillContentZh';
 
 interface MathLabViewProps {
   prefs: UserPreferences;
@@ -83,6 +84,8 @@ export function MathLabView({ prefs, onRecordAttempt }: MathLabViewProps) {
     ? question.defaultVal
     : Math.max(question.minVal, Math.min(question.maxVal, Number(answerInput)));
 
+  const displayQuestion = localizeMathQuestion(locale, question);
+
   return (
     <div className="space-y-6 pb-10">
       {/* Toolbar */}
@@ -125,9 +128,9 @@ export function MathLabView({ prefs, onRecordAttempt }: MathLabViewProps) {
             <p className="text-xs font-mono text-emerald-400">
               {translateMathCategory(locale, question.categoryLabel)}
             </p>
-            <p className="text-xs text-slate-400">{question.contextLine}</p>
+            <p className="text-xs text-slate-400">{displayQuestion.contextLine}</p>
             <h2 className="text-lg sm:text-xl font-semibold text-white leading-snug pt-1">
-              {question.prompt}
+              {displayQuestion.prompt}
             </h2>
           </div>
 
@@ -299,19 +302,25 @@ export function MathLabView({ prefs, onRecordAttempt }: MathLabViewProps) {
                   <span className="text-emerald-400 block font-sans font-semibold mb-0.5">
                     {t('math.potOddsTitle')}
                   </span>
-                  Call / (PotBeforeCall + Call)
+                  {locale === 'zh-CN'
+                    ? '跟注额 / (跟注前底池 + 跟注额)'
+                    : 'Call / (PotBeforeCall + Call)'}
                 </div>
                 <div className="border-t border-[#1E293B] pt-2.5">
                   <span className="text-sky-400 block font-sans font-semibold mb-0.5">
                     {t('math.callEvTitle')}
                   </span>
-                  EV = (Equity × PotWon) − ((1 − Equity) × Call)
+                  {locale === 'zh-CN'
+                    ? 'EV = (胜率 × 赢得底池) − ((1 − 胜率) × 跟注额)'
+                    : 'EV = (Equity × PotWon) − ((1 − Equity) × Call)'}
                 </div>
                 <div className="border-t border-[#1E293B] pt-2.5">
                   <span className="text-amber-300 block font-sans font-semibold mb-0.5">
                     {t('math.mdfTitle')}
                   </span>
-                  MDF = Pot / (Pot + Bet) · α = Bet / (Pot + Bet)
+                  {locale === 'zh-CN'
+                    ? 'MDF = 底池 / (底池 + 下注额) · α = 下注额 / (底池 + 下注额)'
+                    : 'MDF = Pot / (Pot + Bet) · α = Bet / (Pot + Bet)'}
                 </div>
               </div>
 
@@ -423,7 +432,7 @@ export function MathLabView({ prefs, onRecordAttempt }: MathLabViewProps) {
               <div className="space-y-2 border-t border-[#1F2A3A] pt-4">
                 <h3 className="text-xs font-semibold text-slate-200">{t('math.stepByStep')}</h3>
                 <ol className="space-y-1.5 text-xs font-mono text-slate-300">
-                  {question.formulaSteps.map((step, idx) => (
+                  {displayQuestion.formulaSteps.map((step, idx) => (
                     <li
                       key={idx}
                       className="bg-[#0B1017] border border-[#1E293B] rounded-md px-3 py-2"
@@ -435,7 +444,7 @@ export function MathLabView({ prefs, onRecordAttempt }: MathLabViewProps) {
               </div>
 
               <div className="bg-[#0C1814] border border-emerald-500/25 rounded-lg p-3 text-xs text-slate-200 leading-relaxed">
-                {question.takeaway}
+                {displayQuestion.takeaway}
               </div>
             </div>
           )}

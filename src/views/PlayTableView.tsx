@@ -42,6 +42,7 @@ import {
   translateStreetLabel,
   type TranslationKey,
 } from '../i18n/translations';
+import { localizeArenaNote, localizeWinnerSummary } from '../i18n/drillContentZh';
 import type { Seat3DSpec } from '../three/models';
 
 interface PlayTableViewProps {
@@ -331,13 +332,13 @@ export function PlayTableView({
           folded: s.folded,
           isWinner: d.isWinner ?? false,
           streetBetBb: s.streetBetBb,
-          actionText: s.lastActionText || undefined,
+          actionText: s.lastActionText ? translateActionText(locale, s.lastActionText) : undefined,
           styleTag,
           cards: s.cards,
           revealCards: d.revealCards,
         };
       }),
-    [table.seats, table.config.blindReadMode, displaySeats]
+    [table.seats, table.config.blindReadMode, displaySeats, locale]
   );
 
   const activeActorName =
@@ -359,7 +360,9 @@ export function PlayTableView({
       <div className="flex flex-wrap items-center justify-between gap-4 bg-[#0C1814] border border-emerald-500/30 rounded-lg p-3.5">
         <div className="space-y-0.5">
           <p className="text-xs font-mono text-emerald-400">{t('table.showdownResult')}</p>
-          <p className="text-sm font-semibold text-white">{table.winnerSummary}</p>
+          <p className="text-sm font-semibold text-white">
+            {localizeWinnerSummary(locale, table.winnerSummary)}
+          </p>
         </div>
         <button
           type="button"
@@ -601,7 +604,9 @@ export function PlayTableView({
                       </span>
                       <GradeBadge grade={audit.grade} evLossBb={audit.evLossBb} size="sm" />
                     </div>
-                    <p className="text-slate-400 leading-relaxed">{audit.note}</p>
+                    <p className="text-slate-400 leading-relaxed">
+                      {localizeArenaNote(locale, audit.note)}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -620,7 +625,7 @@ export function PlayTableView({
               >
                 <span className="text-slate-300 truncate">
                   <span className="text-emerald-400 mr-1.5">{item.position}</span>
-                  {item.seatName}
+                  {item.seatName === 'Hero' && locale === 'zh-CN' ? t('common.hero') : item.seatName}
                 </span>
                 <span className="text-slate-400 shrink-0">
                   {translateActionText(locale, item.text)}
@@ -651,7 +656,7 @@ export function PlayTableView({
               data-testid="arena-config-badge"
               className="px-2.5 py-0.5 text-xs font-mono rounded-md bg-[#152030] border border-[#273852] text-emerald-300"
             >
-              {table.config.tableSize}-Max · {presetLabel} · {table.config.startingStackBb}bb
+              {locale === 'zh-CN' ? `${table.config.tableSize}人桌` : `${table.config.tableSize}-Max`} · {presetLabel} · {table.config.startingStackBb}bb
             </span>
             <span className="text-xs font-mono text-emerald-400 font-semibold">{statusText}</span>
             <span className="hidden md:inline text-xs font-mono tabular-nums text-slate-400">
@@ -757,7 +762,7 @@ export function PlayTableView({
                 data-testid="arena-config-badge"
                 className="px-2.5 py-0.5 text-xs font-mono rounded-md bg-[#152030] border border-[#273852] text-emerald-300"
               >
-                {table.config.tableSize}-Max · {presetLabel} · {table.config.startingStackBb}bb
+                {locale === 'zh-CN' ? `${table.config.tableSize}人桌` : `${table.config.tableSize}-Max`} · {presetLabel} · {table.config.startingStackBb}bb
               </span>
             </div>
             <p className="text-xs text-slate-400">

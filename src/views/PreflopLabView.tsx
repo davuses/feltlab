@@ -23,6 +23,7 @@ import {
   translatePositionLabel,
   type TranslationKey,
 } from '../i18n/translations';
+import { localizePreflopTemplate } from '../i18n/drillContentZh';
 
 interface PreflopLabViewProps {
   prefs: UserPreferences;
@@ -144,6 +145,8 @@ export function PreflopLabView({
       ? spot.template.matrix[inspectedHand]
       : spot.template.matrix[spot.handKey];
 
+  const localizedTemplate = localizePreflopTemplate(locale, spot.template);
+
   return (
     <div className="space-y-6 pb-10">
       {/* Workspace Filter & Utility Toolbar */}
@@ -153,7 +156,7 @@ export function PreflopLabView({
             {t('preflop.title')}
           </h1>
           <p className="text-xs text-slate-400">
-            {spot.template.subtitle} · {t('preflop.shortcuts')}
+            {localizedTemplate.subtitle} · {t('preflop.shortcuts')}
           </p>
         </div>
 
@@ -241,9 +244,9 @@ export function PreflopLabView({
         {/* Left Interactive Felt Stage */}
         <div className="xl:col-span-7 bg-[#111722] border border-[#222D3D] rounded-xl p-4 sm:p-6 flex flex-col justify-between gap-6">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
-            <span className="font-semibold text-white text-sm">{spot.template.title}</span>
+            <span className="font-semibold text-white text-sm">{localizedTemplate.title}</span>
             <span className="font-mono tabular-nums">
-              {t('preflop.handLabel')} {spot.handKey} · {translateActionText(locale, spot.template.actionSummary)}
+              {t('preflop.handLabel')} {spot.handKey} · {localizedTemplate.actionSummary}
             </span>
           </div>
 
@@ -360,7 +363,7 @@ export function PreflopLabView({
               <div className="space-y-2.5 pt-2 border-t border-[#1F2A3A]">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-medium text-slate-200">
-                    {t('preflop.fullMatrix')} ({spot.template.title})
+                    {t('preflop.fullMatrix')} ({localizedTemplate.title})
                   </span>
                   <div className="flex items-center gap-3 text-[11px] text-slate-400">
                     <span className="inline-flex items-center gap-1">
@@ -403,7 +406,7 @@ export function PreflopLabView({
               </div>
 
               <p className="text-xs text-slate-300 leading-relaxed border-t border-[#1F2A3A] pt-3">
-                {spot.template.strategyNote}
+                {localizedTemplate.strategyNote}
               </p>
             </div>
           )}

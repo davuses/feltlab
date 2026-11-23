@@ -19,6 +19,7 @@ import { SolverBars } from '../components/SolverBars';
 import { playPokerSound } from '../utils/sound';
 import { useLocale } from '../i18n/LocaleContext';
 import { translateActionText, translateStreetLabel } from '../i18n/translations';
+import { localizePostflopSpot } from '../i18n/drillContentZh';
 
 interface PostflopTrainerViewProps {
   prefs: UserPreferences;
@@ -101,6 +102,7 @@ export function PostflopTrainerView({
   });
 
   const spr = (spot.effectiveStackBb / Math.max(1, spot.potBb)).toFixed(1);
+  const displaySpot = localizePostflopSpot(locale, spot);
 
   return (
     <div className="space-y-6 pb-10">
@@ -202,7 +204,7 @@ export function PostflopTrainerView({
         {/* Left Live Felt Stage */}
         <div className="xl:col-span-7 bg-[#111722] border border-[#222D3D] rounded-xl p-4 sm:p-6 flex flex-col justify-between gap-6">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
-            <span className="text-sm font-semibold text-white">{spot.title}</span>
+            <span className="text-sm font-semibold text-white">{displaySpot.title}</span>
             <span className="font-mono tabular-nums">
               {spot.potType} · {spot.heroPos} vs {spot.villainPos} ·{' '}
               {spot.heroInPosition ? 'IP' : 'OOP'}
@@ -265,7 +267,7 @@ export function PostflopTrainerView({
           <div className="space-y-2.5">
             <h2 className="text-sm font-semibold text-white">{t('postflop.actionHistory')}</h2>
             <ol className="space-y-1.5 text-xs text-slate-300 font-mono">
-              {spot.actionLog.map((line, idx) => (
+              {displaySpot.actionLog.map((line, idx) => (
                 <li
                   key={idx}
                   className="flex items-start gap-2.5 bg-[#0B1017] border border-[#1E293B] rounded-md px-3 py-2"
@@ -300,21 +302,21 @@ export function PostflopTrainerView({
               <div className="border-t border-[#1F2A3A] pt-4 space-y-3 text-xs leading-relaxed">
                 <div>
                   <span className="font-semibold text-slate-200 block">{t('postflop.boardTexture')}</span>
-                  <span className="text-slate-400">{spot.takeaways.boardTexture}</span>
+                  <span className="text-slate-400">{displaySpot.takeaways.boardTexture}</span>
                 </div>
                 <div>
                   <span className="font-semibold text-slate-200 block">{t('postflop.rangeAdvantage')}</span>
-                  <span className="text-slate-400">{spot.takeaways.rangeAdvantage}</span>
+                  <span className="text-slate-400">{displaySpot.takeaways.rangeAdvantage}</span>
                 </div>
                 <div>
                   <span className="font-semibold text-slate-200 block">{t('postflop.blockerEffect')}</span>
-                  <span className="text-slate-400">{spot.takeaways.blockerNote}</span>
+                  <span className="text-slate-400">{displaySpot.takeaways.blockerNote}</span>
                 </div>
                 <div className="bg-[#0C1814] border border-emerald-500/25 rounded-lg p-3">
                   <span className="font-semibold text-emerald-300 block mb-0.5">
                     {t('postflop.coreRule')}
                   </span>
-                  <span className="text-slate-200">{spot.takeaways.coreRule}</span>
+                  <span className="text-slate-200">{displaySpot.takeaways.coreRule}</span>
                 </div>
               </div>
             </div>

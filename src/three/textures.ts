@@ -379,116 +379,255 @@ function suitHex(suit: Suit, fourColor: boolean): string {
   if (fourColor) {
     switch (suit) {
       case 's':
-        return '#131924';
+        return '#0a0e16';
       case 'h':
-        return '#c81e34';
+        return '#a80f24';
       case 'd':
-        return '#1360ba';
+        return '#084294';
       case 'c':
-        return '#137a39';
+        return '#0a5e2a';
     }
   }
-  return suit === 'h' || suit === 'd' ? '#c81e34' : '#131924';
+  return suit === 'h' || suit === 'd' ? '#a80f24' : '#0a0e16';
 }
 
 export function createCardFaceTexture(card: Card, fourColor: boolean): THREE.CanvasTexture {
-  const w = 256;
-  const h = 360;
+  const w = 512;
+  const h = 720;
   const [canvas, ctx] = makeCanvas(w, h);
 
-  // Warm matte ivory Kem/Copag casino cardstock (calibrated against overhead spotlight glare)
-  ctx.fillStyle = '#ebe6da';
+  // Calibrated warm matte casino parchment cardstock (balanced luminance under overhead spotlight)
+  const paperGrad = ctx.createRadialGradient(w * 0.45, h * 0.35, 30, w / 2, h / 2, w * 0.9);
+  paperGrad.addColorStop(0, '#c8beaa');
+  paperGrad.addColorStop(0.7, '#bcb19a');
+  paperGrad.addColorStop(1, '#ab9f86');
+  ctx.fillStyle = paperGrad;
   ctx.fillRect(0, 0, w, h);
 
-  // Subtle inner card frame
-  ctx.strokeStyle = '#cbc5b6';
+  // Subtle embossed linen cardstock cross-hatch micro-texture
+  ctx.fillStyle = 'rgba(130, 118, 96, 0.035)';
+  for (let y = 0; y < h; y += 6) {
+    ctx.fillRect(0, y, w, 1);
+  }
+  for (let x = 0; x < w; x += 6) {
+    ctx.fillRect(x, 0, 1, h);
+  }
+
+  // Crisp rounded inner casino card border
+  const drawRoundedRect = (x: number, y: number, rw: number, rh: number, r: number) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + rw - r, y);
+    ctx.quadraticCurveTo(x + rw, y, x + rw, y + r);
+    ctx.lineTo(x + rw, y + rh - r);
+    ctx.quadraticCurveTo(x + rw, y + rh, x + rw - r, y + rh);
+    ctx.lineTo(x + r, y + rh);
+    ctx.quadraticCurveTo(x, y + rh, x, y + rh - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  };
+
+  drawRoundedRect(18, 18, w - 36, h - 36, 28);
+  ctx.strokeStyle = 'rgba(178, 165, 140, 0.72)';
   ctx.lineWidth = 4;
-  ctx.strokeRect(10, 10, w - 20, h - 20);
+  ctx.stroke();
 
   const color = suitHex(card.suit, fourColor);
   const rankDisplay = card.rank === 'T' ? '10' : card.rank;
   const glyph = SUIT_GLYPH[card.suit];
+  const isCourt = card.rank === 'J' || card.rank === 'Q' || card.rank === 'K';
+  const isAce = card.rank === 'A';
+
+  // Royal gilded filigree inner frame on Aces & Court cards
+  if (isCourt || isAce) {
+    drawRoundedRect(88, 134, w - 176, h - 268, 18);
+    ctx.fillStyle = isAce ? 'rgba(202, 166, 86, 0.06)' : 'rgba(202, 166, 86, 0.09)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(182, 144, 66, 0.45)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Decorative corner rosettes inside court frame
+    ctx.strokeStyle = 'rgba(182, 144, 66, 0.28)';
+    ctx.lineWidth = 2;
+    drawRoundedRect(100, 146, w - 200, h - 292, 12);
+    ctx.stroke();
+  }
 
   ctx.fillStyle = color;
   ctx.textBaseline = 'top';
 
-  // Top-left bold corner index
-  ctx.font = '800 66px "JetBrains Mono", ui-monospace, sans-serif';
-  ctx.fillText(rankDisplay, 20, 16);
-  ctx.font = 'bold 54px Georgia, serif';
-  ctx.fillText(glyph, 22, 82);
+  // Top-left ultra-crisp bold corner index
+  ctx.font = '800 124px "JetBrains Mono", ui-monospace, sans-serif';
+  ctx.fillText(rankDisplay, 34, 28);
+  ctx.font = 'bold 100px Georgia, serif';
+  ctx.fillText(glyph, 38, 152);
 
-  // Center suit emblem
+  // Center emblem (ornate halo for Ace, regal crown chevron for J/Q/K, large crisp pip for numbers)
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.font = '144px Georgia, serif';
-  ctx.fillText(glyph, w / 2, h / 2 + 8);
+  if (isAce) {
+    ctx.strokeStyle = 'rgba(182, 144, 66, 0.35)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(w / 2, h / 2 + 8, 118, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.font = '265px Georgia, serif';
+    ctx.fillText(glyph, w / 2, h / 2 + 16);
+  } else if (isCourt) {
+    ctx.fillStyle = 'rgba(182, 144, 66, 0.85)';
+    ctx.font = 'bold 64px Georgia, serif';
+    ctx.fillText(card.rank === 'K' ? '♔' : card.rank === 'Q' ? '♕' : '♗', w / 2, h / 2 - 115);
+    ctx.fillStyle = color;
+    ctx.font = '235px Georgia, serif';
+    ctx.fillText(glyph, w / 2, h / 2 + 24);
+  } else {
+    ctx.font = '260px Georgia, serif';
+    ctx.fillText(glyph, w / 2, h / 2 + 12);
+  }
 
-  // Bottom-right inverted corner
+  // Bottom-right inverted corner index
   ctx.save();
   ctx.translate(w, h);
   ctx.rotate(Math.PI);
+  ctx.fillStyle = color;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
-  ctx.font = '800 66px "JetBrains Mono", ui-monospace, sans-serif';
-  ctx.fillText(rankDisplay, 20, 16);
-  ctx.font = 'bold 54px Georgia, serif';
-  ctx.fillText(glyph, 22, 82);
+  ctx.font = '800 124px "JetBrains Mono", ui-monospace, sans-serif';
+  ctx.fillText(rankDisplay, 34, 28);
+  ctx.font = 'bold 100px Georgia, serif';
+  ctx.fillText(glyph, 38, 152);
   ctx.restore();
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 4;
+  tex.anisotropy = 8;
   return tex;
 }
 
 export function createCardBackTexture(): THREE.CanvasTexture {
-  const w = 256;
-  const h = 360;
+  const w = 512;
+  const h = 720;
   const [canvas, ctx] = makeCanvas(w, h);
 
-  ctx.fillStyle = '#f2efe6';
+  // Warm matte ivory outer casino border (calibrated to avoid spotlight glare)
+  ctx.fillStyle = '#cbc1ad';
   ctx.fillRect(0, 0, w, h);
 
-  ctx.fillStyle = '#150d1d';
-  ctx.fillRect(14, 14, w - 28, h - 28);
+  // Rich Monte-Carlo midnight-plum inner field
+  const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 20, w / 2, h / 2, h * 0.55);
+  bgGrad.addColorStop(0, '#271329');
+  bgGrad.addColorStop(0.6, '#170c1c');
+  bgGrad.addColorStop(1, '#0e0712');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(24, 24, w - 48, h - 48);
 
-  // Ornate crimson/gold casino diamond filigree
-  ctx.strokeStyle = 'rgba(218, 178, 96, 0.36)';
+  // Ornate gilded diamond guilloché lattice
+  ctx.strokeStyle = 'rgba(218, 178, 96, 0.34)';
   ctx.lineWidth = 2;
-  for (let y = 26; y < h - 26; y += 22) {
-    for (let x = 26; x < w - 26; x += 22) {
+  for (let y = 46; y < h - 46; y += 34) {
+    for (let x = 46; x < w - 46; x += 34) {
       ctx.beginPath();
-      ctx.moveTo(x, y - 8);
-      ctx.lineTo(x + 8, y);
-      ctx.lineTo(x, y + 8);
-      ctx.lineTo(x - 8, y);
+      ctx.moveTo(x, y - 13);
+      ctx.lineTo(x + 13, y);
+      ctx.lineTo(x, y + 13);
+      ctx.lineTo(x - 13, y);
       ctx.closePath();
       ctx.stroke();
     }
   }
 
+  // Double metallic gold border frames
   ctx.strokeStyle = '#d4a94d';
-  ctx.lineWidth = 4;
-  ctx.strokeRect(22, 22, w - 44, h - 44);
+  ctx.lineWidth = 6;
+  ctx.strokeRect(38, 38, w - 76, h - 76);
 
-  ctx.fillStyle = '#1c1126';
+  ctx.strokeStyle = 'rgba(244, 214, 138, 0.55)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(50, 50, w - 100, h - 100);
+
+  // Central heraldic medallion crest
+  ctx.fillStyle = '#180d20';
   ctx.beginPath();
-  ctx.arc(w / 2, h / 2, 34, 0, Math.PI * 2);
+  ctx.arc(w / 2, h / 2, 74, 0, Math.PI * 2);
   ctx.fill();
-  ctx.strokeStyle = '#d4a94d';
-  ctx.lineWidth = 3;
+  ctx.strokeStyle = '#e0b75e';
+  ctx.lineWidth = 5;
   ctx.stroke();
 
-  ctx.fillStyle = '#f5e6c4';
-  ctx.font = 'bold 26px Georgia, serif';
+  ctx.strokeStyle = 'rgba(224, 183, 94, 0.45)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(w / 2, h / 2, 62, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.fillStyle = '#f6e3b6';
+  ctx.font = 'bold 54px Georgia, serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('FL', w / 2, h / 2 + 1);
+  ctx.fillText('FL', w / 2, h / 2 + 2);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 4;
+  tex.anisotropy = 8;
+  return tex;
+}
+
+/**
+ * Soft glowing radial bokeh texture for chandelier light-beam dust motes
+ */
+export function createBokehParticleTexture(): THREE.CanvasTexture {
+  const size = 64;
+  const [canvas, ctx] = makeCanvas(size, size);
+  const grad = ctx.createRadialGradient(size / 2, size / 2, 1, size / 2, size / 2, size / 2);
+  grad.addColorStop(0, 'rgba(255, 232, 180, 1)');
+  grad.addColorStop(0.35, 'rgba(255, 212, 130, 0.55)');
+  grad.addColorStop(1, 'rgba(255, 196, 100, 0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+/**
+ * Deep diamond-tufted acoustic velvet wall panel texture for the private casino salon backdrop
+ */
+export function createVelvetPanelTexture(maxAnisotropy: number): THREE.CanvasTexture {
+  const size = 256;
+  const [canvas, ctx] = makeCanvas(size, size);
+
+  ctx.fillStyle = '#0e1714';
+  ctx.fillRect(0, 0, size, size);
+
+  // Subtle dark emerald-obsidian diamond tufting with golden micro-buttons
+  const step = 64;
+  ctx.strokeStyle = 'rgba(4, 10, 8, 0.72)';
+  ctx.lineWidth = 3;
+  for (let y = 0; y <= size; y += step) {
+    for (let x = 0; x <= size; x += step) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + step, y + step);
+      ctx.moveTo(x + step, y);
+      ctx.lineTo(x, y + step);
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(196, 158, 78, 0.22)';
+      ctx.beginPath();
+      ctx.arc(x, y, 2.6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(3, 5);
+  tex.anisotropy = Math.min(4, maxAnisotropy);
   return tex;
 }
 

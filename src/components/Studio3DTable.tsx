@@ -8,6 +8,8 @@ import {
   Palette,
   RefreshCw,
   Sun,
+  Volume2,
+  VolumeX,
   Wine,
 } from 'lucide-react';
 import type { Card } from '../poker/types';
@@ -55,6 +57,7 @@ export function Studio3DTable({
   const [feltTheme, setFeltTheme] = useState<FeltThemeId>('emerald');
   const [lighting, setLighting] = useState<LightingPresetId>('studio');
   const [showProps, setShowProps] = useState<boolean>(true);
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [dockVisible, setDockVisible] = useState(true);
   const [webglError, setWebglError] = useState<string | null>(null);
 
@@ -72,6 +75,7 @@ export function Studio3DTable({
         feltTheme,
         lighting,
         showProps,
+        soundEnabled,
       });
       sceneRef.current = controller;
       setWebglError(null);
@@ -87,7 +91,7 @@ export function Studio3DTable({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Push live hand / theme / lighting / props updates cleanly
+  // Push live hand / theme / lighting / props / audio updates cleanly
   useEffect(() => {
     sceneRef.current?.updateSceneData({
       board,
@@ -97,10 +101,11 @@ export function Studio3DTable({
       feltTheme,
       lighting,
       showProps,
+      soundEnabled,
     });
-  }, [board, potBb, seats, fourColorDeck, feltTheme, lighting, showProps]);
+  }, [board, potBb, seats, fourColorDeck, feltTheme, lighting, showProps, soundEnabled]);
 
-  // Keyboard shortcuts: 1-4 camera presets, H toggle dock, P toggle ambient props
+  // Keyboard shortcuts: 1-5 camera presets, H toggle dock, P toggle ambient props, M toggle SFX
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -116,10 +121,15 @@ export function Studio3DTable({
       } else if (e.key === '4') {
         setCameraPreset('closeup');
         sceneRef.current?.setCameraPreset('closeup');
+      } else if (e.key === '5') {
+        setCameraPreset('rail');
+        sceneRef.current?.setCameraPreset('rail');
       } else if (e.key.toLowerCase() === 'h') {
         setDockVisible((v) => !v);
       } else if (e.key.toLowerCase() === 'p') {
         setShowProps((v) => !v);
+      } else if (e.key.toLowerCase() === 'm') {
+        setSoundEnabled((v) => !v);
       }
     };
     window.addEventListener('keydown', onKeyDown);
@@ -224,6 +234,7 @@ export function Studio3DTable({
                 { id: 'broadcast', label: t('studio3d.camBroadcast') },
                 { id: 'topdown', label: t('studio3d.camTopDown') },
                 { id: 'closeup', label: t('studio3d.camCloseUp') },
+                { id: 'rail', label: t('studio3d.camRail') },
               ] as const
             ).map((cam) => (
               <button
@@ -241,7 +252,7 @@ export function Studio3DTable({
             ))}
           </div>
 
-          {/* Right Controls: Felt Finish, Studio Light, Deck & Deal Runout */}
+          {/* Right Controls: Felt Finish, Studio Light, Props, SFX, Deck & Deal Runout */}
           <div className="flex flex-wrap items-center gap-2">
             <select
               aria-label={t('studio3d.feltLabel')}
@@ -281,6 +292,25 @@ export function Studio3DTable({
             >
               <Wine className="w-3.5 h-3.5" aria-hidden="true" />
               <span>{showProps ? t('studio3d.propsOn') : t('studio3d.propsOff')}</span>
+            </button>
+
+            <button
+              type="button"
+              data-testid="toggle-table-sfx"
+              aria-pressed={soundEnabled}
+              onClick={() => setSoundEnabled((v) => !v)}
+              className={`px-2.5 py-1 text-xs font-medium rounded-md border inline-flex items-center gap-1 cursor-pointer whitespace-nowrap ${
+                soundEnabled
+                  ? 'bg-emerald-500/15 border-emerald-400/40 text-emerald-200'
+                  : 'bg-[#151E2C] border-[#253349] text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {soundEnabled ? (
+                <Volume2 className="w-3.5 h-3.5" aria-hidden="true" />
+              ) : (
+                <VolumeX className="w-3.5 h-3.5" aria-hidden="true" />
+              )}
+              <span>{soundEnabled ? t('studio3d.soundOn') : t('studio3d.soundOff')}</span>
             </button>
 
             {onToggleFourColor && (

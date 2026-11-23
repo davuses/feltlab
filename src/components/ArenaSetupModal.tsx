@@ -257,7 +257,9 @@ export function ArenaSetupModal({ open, config, onClose, onApply }: ArenaSetupMo
                 {t('arena.customRoster')}
               </span>
               <span className="text-[11px] font-mono text-slate-400">
-                {draft.botArchetypes.length} bots
+                {locale === 'zh-CN'
+                  ? `${draft.botArchetypes.length} 名 AI`
+                  : `${draft.botArchetypes.length} bots`}
               </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

@@ -10,6 +10,7 @@ import type {
 import { GradeBadge } from '../components/GradeBadge';
 import { useLocale } from '../i18n/LocaleContext';
 import { translateActionText, translateModuleLabel } from '../i18n/translations';
+import { localizeSpotLabel } from '../i18n/drillContentZh';
 
 interface LeakTrackerViewProps {
   user: User | null;
@@ -363,7 +364,7 @@ export function LeakTrackerView({
                 {filteredAttempts.slice(0, 40).map((att) => (
                   <tr key={att.id} className="hover:bg-[#151D2B]/60 transition-colors">
                     <td className="py-3 pr-4 font-medium text-slate-200 max-w-[240px] truncate">
-                      {att.spotLabel}
+                      {localizeSpotLabel(locale, att.spotLabel)}
                     </td>
                     <td className="py-3 px-3 text-slate-400 whitespace-nowrap">
                       {translateModuleLabel(locale, att.module)}

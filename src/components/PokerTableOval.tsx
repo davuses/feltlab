@@ -82,7 +82,9 @@ export function PokerTableOval({
               <div className="flex items-center justify-between font-mono tabular-nums text-[10px] text-slate-400 mt-0.5">
                 <span>{seat.stackBb.toFixed(1)}bb</span>
                 {seat.actionText && (
-                  <span className="text-amber-300 truncate max-w-[64px]">{seat.actionText}</span>
+                  <span className="text-amber-300 truncate max-w-[64px]">
+                    {translateActionText(locale, seat.actionText)}
+                  </span>
                 )}
               </div>
             </div>
