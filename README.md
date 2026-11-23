@@ -1,5 +1,7 @@
 # FeltLab — 6-Max Texas Hold'em Mastery Studio
 
+[Open FeltLab](https://davuses.github.io/feltlab/)
+
 **FeltLab** is an interactive 6-max 100bb No-Limit Texas Hold'em training studio designed to replace table guesswork with deliberate, solver-grounded repetition. Practice preflop ranges, postflop decision trees, pot odds & EV math, multi-street hand reading, and full hands against configurable strategic bots on an interactive 3D casino poker table.
 
 ---
